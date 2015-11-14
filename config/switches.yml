@@ -1,0 +1,16 @@
+SW13-1:
+  address: 10.111.0.178
+  community: 6eggtoo9
+
+SW14-1:
+  address: 10.111.0.179
+  community: 6eggtoo9
+
+SW13-2:
+  address: 10.111.0.180
+  community: 6eggtoo9
+
+SW14-2:
+  address: 10.111.0.181
+  community: 6eggtoo9
+

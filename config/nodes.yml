@@ -1,0 +1,15 @@
+c14-7:
+  bmc: 
+    address: 10.131.14.7
+    user: USERID
+    password: PASSW0RD
+  switchports: 
+    SW14-1: 
+      port: 7
+      vlan: 119
+    SW14-2:
+      port: 7
+      vlan: 119
+    SW13-2:
+      port: 27
+      vlan: 119
