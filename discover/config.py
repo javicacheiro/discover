@@ -6,7 +6,11 @@ from __future__ import print_function, with_statement
 import os
 import yaml
 
-        
+DEFAULT_CONF_DIRS = [os.path.expanduser('~/.discover'), '/etc/discover', './config']
+switches = {}
+nodes = {}
+
+
 class Config():
     """Configuration object
 
@@ -46,3 +50,11 @@ class Config():
             dict.__repr__(self.switches),
             dict.__repr__(self.nodes)
         )
+
+
+# Load config and expose it globally
+for confdir in DEFAULT_CONF_DIRS:
+    if os.path.exists(confdir):
+        cfg = Config(confdir)
+        switches = cfg.switches
+        nodes = cfg.nodes

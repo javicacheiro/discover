@@ -4,11 +4,9 @@
 """
 from __future__ import print_function
 
-import os
 import click
-from .config import Config
+from . import config
 
-DEFAULT_CONF_DIRS = ['~/.discover', '/etc/discover', './config']
 
 @click.group(chain=True)
 def cli():
@@ -24,15 +22,8 @@ def cli():
 @cli.command('learn')
 @click.option('-c', '--confdir', default='', help="Conf directory")
 def learn_cmd(confdir):
-    if confdir:
-        if os.path.exists(confdir):
-            cfg = Config(confdir)
-    else:
-        for confdir in DEFAULT_CONF_DIRS:
-            if os.path.exists(confdir):
-                cfg = Config(confdir)
-    if cfg:
-        click.echo(cfg)
+    if config.switches:
+        click.echo(config.switches)
     else:
         click.echo("ERROR: Unable to load configuration files")
 
