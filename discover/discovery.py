@@ -35,17 +35,22 @@ def discover_all():
         node = discover_node(nodename, poweron=False)
         nodes.append(node)
     for node in nodes:
-        if node.has_missing_macs() and node.is_off():
-            logger.info('Powering on node {}'.format(node.name))
-            node.power_on()
-        else:
-            logger.warn('Node {} is already on'.format(node.name))
+        if node.has_missing_macs():
+            if node.is_off():
+                logger.info('Powering on node {}'.format(node.name))
+                node.power_on()
+            else:
+                logger.warn(
+                    '{} that has missing MACs was already on'.format(
+                        node.name))
     for _ in range(RETRIES):
         logger.info('Waiting {} seconds to retry'.format(DELAY))
         time.sleep(DELAY)
         for node in nodes:
             if node.has_missing_macs():
                 _query_switches(node)
+    for node in nodes:
+        inventory.save(node)
     return nodes
 
 
