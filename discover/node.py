@@ -5,6 +5,10 @@
 from __future__ import print_function, with_statement
 import subprocess
 import re
+import time
+
+# Seconds to wait for the OS to shutdown gracefully
+SHUTDOWN_GRACE_TIME = 5
 
 
 class BMC(object):
@@ -36,6 +40,12 @@ class BMC(object):
 
     def power_off(self):
         """Power off the node"""
+        # First try soft-shutdown of OS via ACPI
+        self._run_ipmi_cmd('chassis power soft')
+        for _ in range(SHUTDOWN_GRACE_TIME):
+            time.sleep(1)
+            if self.is_off():
+                return True
         return self._run_ipmi_cmd('chassis power off')
 
     def _run_ipmi_cmd(self, cmd):

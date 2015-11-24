@@ -28,7 +28,7 @@ class ReachedRetryCount(Exception):
     pass
 
 
-def discover_all(parallel=True, poweron=True):
+def discover_all(parallel=True, poweron=True, poweroff=False):
     """Discover all nodes given in the configuration"""
     nodes = []
 
@@ -50,18 +50,34 @@ def discover_all(parallel=True, poweron=True):
                 logger.debug('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
-                logger.warn(
-                    '{} that has missing MACs was already on'.format(
-                        node.name))
-    for _ in range(RETRIES):
-        logger.info('Waiting {} seconds to retry'.format(DELAY))
+                if poweroff:
+                    logger.debug('Powering off node {}'.format(node.name))
+                    node.power_off()
+                    logger.debug('Powering on node {}'.format(node.name))
+                    node.power_on()
+                else:
+                    logger.warn(
+                        '{} that has missing MACs was already on'.format(
+                            node.name))
+    for attempt in range(RETRIES):
+        logger.info('Attempt {}/{}'.format(attempt, RETRIES))
+        logger.debug('Waiting {} seconds to retry'.format(DELAY))
         time.sleep(DELAY)
+        finished = True
         for node in nodes:
             if node.has_missing_macs():
                 _query_switches(node)
+            if node.has_missing_macs():
+                finished = False
+        if finished:
+            for node in nodes:
+                inventory.save(node)
+            return nodes
+
     for node in nodes:
         inventory.save(node)
-    return nodes
+
+    raise ReachedRetryCount('Unable to discover all nodes')
 
 
 def discover_node(nodename, poweron=True):
@@ -92,6 +108,7 @@ def discover_node(nodename, poweron=True):
             for attempt in range(RETRIES):
                 logger.info('Attempt {}/{}'.format(attempt, RETRIES))
                 if node.has_missing_macs():
+                    logger.debug('Waiting {} seconds to retry'.format(DELAY))
                     time.sleep(DELAY)
                 else:
                     inventory.save(node)
