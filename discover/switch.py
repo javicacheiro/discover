@@ -37,7 +37,7 @@ class SNMPClient(object):
                 try:
                     port = int(dbPort[idx])
                     logger.debug('{} {} {}'.format(port, mac, vlan))
-                    table[port].append({"vlan": int(vlan), "mac": str(mac)})
+                    table[port].append({"vlan": int(vlan), "mac": _normalize_mac(mac)})
                 except SNMPException:
                     logger.error('Unable to get port for mac: {} {}'.format(vlan, mac))
         logger.info('Finished retrieving MAC table for {}'.format(self.address))
@@ -94,6 +94,12 @@ class Switch(object):
                     entry['mac'], port, vlan))
                 macs_seen.append(entry['mac'])
         return macs_seen
+
+
+def _normalize_mac(mac):
+    """Format a MAC address to a canonical format: A1:F2:03:04:05:06"""
+    mac = str(mac)
+    return ':'.join([i.zfill(2) for i in mac.split(":")]).upper()
 
 
 def query(name, port, vlan=1):
