@@ -40,7 +40,7 @@ class SNMPClient(object):
                     table[port].append({"vlan": int(vlan), "mac": _normalize_mac(mac)})
                 except SNMPException:
                     logger.error('Unable to get port for mac: {} {}'.format(vlan, mac))
-        logger.info('Finished retrieving MAC table for {}'.format(self.address))
+        logger.debug('Finished retrieving MAC table for {}'.format(self.address))
         return table
 
     def get_port_info_table(self):
@@ -85,7 +85,7 @@ class Switch(object):
         """Return the macs seen on a given port an vlan"""
         elapsed_seconds = time.time() - self._last_updated_macs
         if elapsed_seconds > CACHE_TIME:
-            logger.info('Cached MAC info expired: querying the switch')
+            logger.debug('Cached MAC info expired: querying the switch')
             self.update_macs()
         macs_seen = []
         for entry in self.macs[port]:

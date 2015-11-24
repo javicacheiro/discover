@@ -34,10 +34,11 @@ def discover_all():
     for nodename in config.nodes:
         node = discover_node(nodename, poweron=False)
         nodes.append(node)
+    logger.debug('Powering on the nodes')
     for node in nodes:
         if node.has_missing_macs():
             if node.is_off():
-                logger.info('Powering on node {}'.format(node.name))
+                logger.debug('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
                 logger.warn(
@@ -78,8 +79,9 @@ def discover_node(nodename, poweron=True):
                 logger.info('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
-                logger.warn('Node {} already on'.format(node.name))
-            for _ in range(RETRIES):
+                logger.warn('Node {} was already on'.format(node.name))
+            for attempt in range(RETRIES):
+                logger.info('Attempt {}/{}'.format(atempt, RETRIES))
                 if node.has_missing_macs():
                     time.sleep(DELAY)
                 else:
@@ -91,7 +93,7 @@ def discover_node(nodename, poweron=True):
             inventory.save(node)
             return node
         else:
-            logger.error('Unable to find all MACs for node {}'.format(node.name))
+            logger.warn('Unable to find all MACs for node {}'.format(node.name))
             logger.info('MACs found: {}'.format(node.switchports))
             inventory.save(node)
             raise ReachedRetryCount(
@@ -115,5 +117,5 @@ def _query_switches(node):
                 raise MultipleMacException(
                     'Found more than one MAC in the given port')
             else:
-                logger.warn('MAC not found for node {} on switch {}'.format(
+                logger.debug('MAC not found for node {} on switch {}'.format(
                     node.name, swname))
