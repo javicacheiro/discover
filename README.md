@@ -20,11 +20,30 @@ Installing dependencies: click, PyYAML, Jinja2, snimpy
     pip install PyYAML
     pip install Jinja2
 
-**snimpy** needs libffi-dev and libsmi2-dev packages:
+Before installing **snimpy** you need gcc, libffi-dev and libsmi2-dev packages.
 
+In Ubuntu 14.04:
+
+    sudo apt-get install gcc
     sudo apt-get install libffi-dev
     sudo apt-get install libsmi2-dev
+
+In RHEL7/CentOS/SL:
+
+    yum install gcc
+    yum install libffi-devel.x86_64
+    yum install libsmi-devel.x86_64
+
+After that you can install snimpy:
+
     pip install snimpy
+
+
+    git clone https://github.com/javicacheiro/discover
+    cd discover
+    virtualenv venv
+    . venv/bin/activate
+    pip install --editable .
 
 Usage
 -----

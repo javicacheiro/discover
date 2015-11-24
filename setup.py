@@ -1,14 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='discover',
     version='0.1',
-    packages=['discover'],
+    packages=find_packages(),
     include_package_data=True,
     install_requires=[
         'click',
         'PyYAML',
         'Jinja2',
+        'snimpy',
     ],
     entry_points='''
         [console_scripts]
