@@ -43,24 +43,24 @@ def discover_all(parallel=True, poweron=True, poweroff=False):
     for nodename in config.nodes:
         node = discover_node(nodename, poweron=False)
         nodes.append(node)
-    logger.debug('Powering on the nodes')
     for node in nodes:
         if node.has_missing_macs():
             if node.is_off():
-                logger.debug('Powering on node {}'.format(node.name))
+                logger.info('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
                 if poweroff:
-                    logger.debug('Powering off node {}'.format(node.name))
+                    logger.info('Powering off node {}'.format(node.name))
                     node.power_off()
-                    logger.debug('Powering on node {}'.format(node.name))
+                    logger.info('Powering on node {}'.format(node.name))
                     node.power_on()
                 else:
                     logger.warn(
-                        '{} that has missing MACs was already on'.format(
-                            node.name))
+                        '{} with missing MACs is already on'.format(node.name))
+                    logger.warn(
+                        'CLI is run without poweroff option so you should reboot the node manually')
     for attempt in range(RETRIES):
-        logger.info('Attempt {}/{}'.format(attempt, RETRIES))
+        logger.info('Attempt {}/{}'.format(attempt+1, RETRIES))
         logger.debug('Waiting {} seconds to retry'.format(DELAY))
         time.sleep(DELAY)
         finished = True
@@ -106,7 +106,7 @@ def discover_node(nodename, poweron=True):
             else:
                 logger.warn('Node {} was already on'.format(node.name))
             for attempt in range(RETRIES):
-                logger.info('Attempt {}/{}'.format(attempt, RETRIES))
+                logger.info('Attempt {}/{}'.format(attempt+1, RETRIES))
                 if node.has_missing_macs():
                     logger.debug('Waiting {} seconds to retry'.format(DELAY))
                     time.sleep(DELAY)
