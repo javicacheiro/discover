@@ -52,5 +52,9 @@ def print_node(node):
     """Print the information about a given node"""
     macs = {}
     for sw, opts in node.switchports.items():
-        macs[opts['nic']] = opts['mac']
+        if 'mac' in opts:
+            macs[opts['nic']] = opts['mac']
+        else:
+            macs[opts['nic']] = 'UNKNOWN'
+    #TODO: Make the NIC printing generic: sorted(macs), homogeneous groups of nodes
     print('{} {} {} {}'.format(node.name, macs['x1'], macs['n1'], macs['n2']))

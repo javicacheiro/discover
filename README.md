@@ -21,6 +21,7 @@ Installing dependencies: click, PyYAML, Jinja2, snimpy
     pip install Jinja2
 
 **snimpy** needs libffi-dev and libsmi2-dev packages:
+
     sudo apt-get install libffi-dev
     sudo apt-get install libsmi2-dev
     pip install snimpy

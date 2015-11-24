@@ -39,7 +39,7 @@ def discover_all():
             logger.info('Powering on node {}'.format(node.name))
             node.power_on()
         else:
-            logger.warn('Node {} already on'.format(node.name))
+            logger.warn('Node {} is already on'.format(node.name))
     for _ in range(RETRIES):
         logger.info('Waiting {} seconds to retry'.format(DELAY))
         time.sleep(DELAY)
@@ -68,7 +68,7 @@ def discover_node(nodename, poweron=True):
 
     if poweron is True:
         # Second try: we turn on the node and retry
-        if node.has_all_macs() is False:
+        if node.has_missing_macs():
             if node.is_off():
                 logger.info('Powering on node {}'.format(node.name))
                 node.power_on()
@@ -88,10 +88,12 @@ def discover_node(nodename, poweron=True):
         else:
             logger.error('Unable to find all MACs for node {}'.format(node.name))
             logger.info('MACs found: {}'.format(node.switchports))
-            raise ReachedRetryCount('Unable to find all MACs for node {}'.format(
-                node.name))
+            inventory.save(node)
+            raise ReachedRetryCount(
+                'Unable to find all MACs for node {}'.format(node.name))
     else:
         # If poweron=False just return what we found until now
+        inventory.save(node)
         return node
 
 
