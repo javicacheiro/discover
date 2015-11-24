@@ -62,3 +62,18 @@ class Node(BMC):
         self.bmcuser = bmcuser
         self.bmcpasswd = bmcpasswd
         self.macs = {}
+
+    def add_mac(self, switch, mac):
+        """Associate the given mac to the switchport"""
+        self.switchports[switch]['mac'] = mac
+
+    def has_all_macs(self):
+        """Confirm if all the MACs are available"""
+        for sw, swopts in self.switchports.items():
+            if 'mac' not in swopts:
+                return False
+        return True
+
+    def has_missing_macs(self):
+        """Confirm if there are missing MACs"""
+        return not self.has_all_macs()

@@ -4,6 +4,8 @@
 """
 from __future__ import print_function, with_statement
 import os
+import logging
+import logging.config
 import yaml
 
 DEFAULT_CONF_DIRS = [os.path.expanduser('~/.discover'), '/etc/discover', './config']
@@ -14,15 +16,16 @@ nodes = {}
 class Config():
     """Configuration object
 
-    Contains the switches and nodes information
+    Contains the switches, nodes and logging information
     """
 
-    def __init__(self, confdir='', switches={}, nodes={}):
+    def __init__(self, confdir='', switches={}, nodes={}, logconf={}):
         if confdir:
             self.load(confdir)
-        elif switches and nodes:
+        elif switches and nodes and logconf:
             self.switches = switches
             self.nodes = nodes
+            self.logconf = logconf
 
     def load(self, confdir):
         """Load yaml configuration files from confdir
@@ -32,13 +35,16 @@ class Config():
         Two config files are needed:
             - switches.yml: info about the switches
             - nodes.yml: info about the nodes to scan
+            - logging.yml: logging configuration
 
         :param confdir: the directory that contains the config files.
         """
         swfile = os.path.join(confdir, 'switches.yml')
         nodesfile = os.path.join(confdir, 'nodes.yml')
+        logconffile = os.path.join(confdir, 'logging.yml')
         self.switches = self._load_file(swfile)
         self.nodes = self._load_file(nodesfile)
+        self.logconf = self._load_file(logconffile)
 
     def _load_file(self, filename):
         """Return a object representing the contents of a yaml file"""
@@ -48,7 +54,8 @@ class Config():
     def __repr__(self):
         return '<%s(switches=%s, nodes=%s)>' % (self.__class__.__name__,
             dict.__repr__(self.switches),
-            dict.__repr__(self.nodes)
+            dict.__repr__(self.nodes),
+            dict.__repr__(self.logconf),
         )
 
 
@@ -56,5 +63,7 @@ class Config():
 for confdir in DEFAULT_CONF_DIRS:
     if os.path.exists(confdir):
         cfg = Config(confdir)
+        logging.config.dictConfig(cfg.logconf)
         switches = cfg.switches
         nodes = cfg.nodes
+logging.info('Configuration loaded')
