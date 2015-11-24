@@ -37,7 +37,7 @@ class SNMPClient(object):
                 try:
                     port = int(dbPort[idx])
                     logger.debug('{} {} {}'.format(port, mac, vlan))
-                    table[port].append({"vlan": int(vlan), "mac": mac})
+                    table[port].append({"vlan": int(vlan), "mac": str(mac)})
                 except SNMPException:
                     logger.error('Unable to get port for mac: {} {}'.format(vlan, mac))
         logger.info('Finished retrieving MAC table for {}'.format(self.address))
@@ -90,6 +90,8 @@ class Switch(object):
         macs_seen = []
         for entry in self.macs[port]:
             if entry['vlan'] == vlan:
+                logger.info('Found MAC {} on port {} vlan {}'.format(
+                    entry['mac'], port, vlan))
                 macs_seen.append(entry['mac'])
         return macs_seen
 

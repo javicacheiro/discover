@@ -5,10 +5,10 @@
 from __future__ import print_function, with_statement
 import logging
 import time
-#FIXME: Change to relative imports in the final version (not possible for interactive use)
-from node import Node
-import switch
-import config
+from .node import Node
+from . import switch
+from . import config
+from . import inventory
 
 # Number of retries
 RETRIES = 6
@@ -51,10 +51,17 @@ def discover_all():
 
 def discover_node(nodename, poweron=True):
     """Find the MAC addresses of a given node"""
-    nodecfg = config.nodes[nodename]
-    node = Node(nodename, nodecfg['switchports'],
-                nodecfg['bmc']['address'], nodecfg['bmc']['user'],
-                nodecfg['bmc']['password'])
+    try:
+        node = inventory.load(nodename)
+    except inventory.NodeNotFoundError:
+        nodecfg = config.nodes[nodename]
+        node = Node(nodename, nodecfg['switchports'],
+                    nodecfg['bmc']['address'], nodecfg['bmc']['user'],
+                    nodecfg['bmc']['password'])
+
+    # Nothing to do if it already has all the macs discovered from inventory
+    if node.has_all_macs():
+        return node
 
     # First try: we retrieve what the switches already now
     _query_switches(node)
@@ -68,13 +75,15 @@ def discover_node(nodename, poweron=True):
             else:
                 logger.warn('Node {} already on'.format(node.name))
             for _ in range(RETRIES):
-                if node.has_all_macs() is False:
+                if node.has_missing_macs():
                     time.sleep(DELAY)
                 else:
+                    inventory.save(node)
                     return node
                 _query_switches(node)
         # Recap
         if node.has_all_macs():
+            inventory.save(node)
             return node
         else:
             logger.error('Unable to find all MACs for node {}'.format(node.name))

@@ -4,8 +4,10 @@
 """
 from __future__ import print_function
 
+import json
 import click
-from . import config
+from . import discovery
+from . import inventory
 
 
 @click.group(chain=True)
@@ -20,12 +22,20 @@ def cli():
 
 
 @cli.command('learn')
-@click.option('-c', '--confdir', default='', help="Conf directory")
-def learn_cmd(confdir):
-    if config.switches:
-        click.echo(config.switches)
+@click.option('--poweron/--no-poweron', default=False, help="Poweron nodes for discovery")
+@click.argument('nodename')
+def learn_cmd(poweron, nodename):
+    if nodename.lower() == 'all':
+        discovery.discover_all()
+        inventory.show()
     else:
-        click.echo("ERROR: Unable to load configuration files")
+        node = discovery.discover_node(nodename, poweron=poweron)
+        inventory.print_node(node)
+
+
+@cli.command('show')
+def show_cmd():
+    inventory.show()
 
 
 @cli.command('cobbler')

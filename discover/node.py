@@ -61,7 +61,10 @@ class Node(BMC):
         self.bmcaddr = bmcaddr
         self.bmcuser = bmcuser
         self.bmcpasswd = bmcpasswd
-        self.macs = {}
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__, self.name, self.switchports,
+                               self.bmcaddr, self.bmcuser, self.bmcpasswd)
 
     def add_mac(self, switch, mac):
         """Associate the given mac to the switchport"""

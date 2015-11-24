@@ -7,8 +7,15 @@ import os
 import logging
 import logging.config
 import yaml
+from jinja2 import Environment, FileSystemLoader
+
 
 DEFAULT_CONF_DIRS = [os.path.expanduser('~/.discover'), '/etc/discover', './config']
+
+SWFILE = 'switches.yml'
+NODESFILE = 'nodes.yml'
+LOGCONFFILE = 'logging.yml'
+
 switches = {}
 nodes = {}
 
@@ -39,17 +46,19 @@ class Config():
 
         :param confdir: the directory that contains the config files.
         """
-        swfile = os.path.join(confdir, 'switches.yml')
-        nodesfile = os.path.join(confdir, 'nodes.yml')
-        logconffile = os.path.join(confdir, 'logging.yml')
-        self.switches = self._load_file(swfile)
-        self.nodes = self._load_file(nodesfile)
-        self.logconf = self._load_file(logconffile)
+        self.switches = self._load_file(SWFILE)
+        self.nodes = self._load_file(NODESFILE)
+        self.logconf = self._load_file(LOGCONFFILE)
 
     def _load_file(self, filename):
         """Return a object representing the contents of a yaml file"""
-        with open(filename, 'r') as ymlfile:
-            return yaml.load(ymlfile)
+        env = Environment(loader=FileSystemLoader(DEFAULT_CONF_DIRS, followlinks=True))
+        template = env.get_template(filename)
+        ymlfile = template.render(switches=switches, nodes=nodes)
+        return yaml.load(ymlfile)
+
+        #with open(filename, 'r') as ymlfile:
+        #    return yaml.load(ymlfile)
 
     def __repr__(self):
         return '<%s(switches=%s, nodes=%s)>' % (self.__class__.__name__,
