@@ -28,9 +28,18 @@ class ReachedRetryCount(Exception):
     pass
 
 
-def discover_all():
+def discover_all(parallel=True, poweron=True):
     """Discover all nodes given in the configuration"""
     nodes = []
+
+    # If we have to do sequential discovery
+    if not parallel:
+        for nodename in config.nodes:
+            node = discover_node(nodename, poweron=poweron)
+            nodes.append(node)
+        return nodes
+
+    # In other case let's do it in parallel
     for nodename in config.nodes:
         node = discover_node(nodename, poweron=False)
         nodes.append(node)
@@ -81,7 +90,7 @@ def discover_node(nodename, poweron=True):
             else:
                 logger.warn('Node {} was already on'.format(node.name))
             for attempt in range(RETRIES):
-                logger.info('Attempt {}/{}'.format(atempt, RETRIES))
+                logger.info('Attempt {}/{}'.format(attempt, RETRIES))
                 if node.has_missing_macs():
                     time.sleep(DELAY)
                 else:

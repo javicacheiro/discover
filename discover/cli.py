@@ -4,7 +4,6 @@
 """
 from __future__ import print_function
 
-import json
 import click
 from . import discovery
 from . import inventory
@@ -22,11 +21,12 @@ def cli():
 
 
 @cli.command('learn')
-@click.option('--poweron/--no-poweron', default=False, help="Poweron nodes for discovery")
+@click.option('--poweron/--no-poweron', default=True, help="Poweron nodes for discovery")
+@click.option('--parallel/--no-parallel', default=True, help="Discover in parallel/sequential way")
 @click.argument('nodename')
-def learn_cmd(poweron, nodename):
+def learn_cmd(poweron, parallel, nodename):
     if nodename.lower() == 'all':
-        discovery.discover_all()
+        discovery.discover_all(parallel=parallel, poweron=poweron)
         inventory.show()
     else:
         node = discovery.discover_node(nodename, poweron=poweron)
