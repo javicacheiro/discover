@@ -63,7 +63,7 @@ class Node(BMC):
         self.bmcpasswd = bmcpasswd
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__, self.name, self.switchports,
+        return '<{}({})>'.format(self.__class__, self.name, self.switchports,
                                self.bmcaddr, self.bmcuser, self.bmcpasswd)
 
     def add_mac(self, switch, mac):

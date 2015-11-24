@@ -61,10 +61,11 @@ class Config():
         #    return yaml.load(ymlfile)
 
     def __repr__(self):
-        return '<%s(switches=%s, nodes=%s)>' % (self.__class__.__name__,
+        return '<{}(switches={}, nodes={}, logconf={})>'.format(
+            self.__class__.__name__,
             dict.__repr__(self.switches),
             dict.__repr__(self.nodes),
-            dict.__repr__(self.logconf),
+            dict.__repr__(self.logconf)
         )
 
 
@@ -75,4 +76,4 @@ for confdir in DEFAULT_CONF_DIRS:
         logging.config.dictConfig(cfg.logconf)
         switches = cfg.switches
         nodes = cfg.nodes
-logging.info('Configuration loaded')
+        logging.debug('Configuration loaded from {}'.format(confdir))
