@@ -80,7 +80,7 @@ def discover_all(parallel=True, poweron=True, poweroff=False):
     raise ReachedRetryCount('Unable to discover all nodes')
 
 
-def discover_node(nodename, poweron=True):
+def discover_node(nodename, poweron=True, poweroff=False):
     """Find the MAC addresses of a given node"""
     try:
         node = inventory.load(nodename)
@@ -97,7 +97,7 @@ def discover_node(nodename, poweron=True):
     # First try: we retrieve what the switches already now
     _query_switches(node)
 
-    if poweron is True:
+    if poweron:
         # Second try: we turn on the node and retry
         if node.has_missing_macs():
             if node.is_off():
@@ -105,6 +105,16 @@ def discover_node(nodename, poweron=True):
                 node.power_on()
             else:
                 logger.warn('Node {} was already on'.format(node.name))
+                if poweroff:
+                    logger.info('Powering off node {}'.format(node.name))
+                    node.power_off()
+                    logger.info('Powering on node {}'.format(node.name))
+                    node.power_on()
+                else:
+                    logger.warn(
+                        '{} with missing MACs is already on'.format(node.name))
+                    logger.warn(
+                        'CLI is run without poweroff option so you should reboot the node manually')
             for attempt in range(RETRIES):
                 logger.info('Attempt {}/{}'.format(attempt+1, RETRIES))
                 if node.has_missing_macs():
