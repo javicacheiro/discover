@@ -3,10 +3,14 @@
    Implements the CLI interface using click
 """
 from __future__ import print_function
-
+import logging
 import click
 from . import discovery
 from . import inventory
+# we need the config module to load the logging configuration
+from . import config
+
+logger = logging.getLogger(__name__)
 
 
 @click.group(chain=True)
@@ -42,8 +46,9 @@ def learn_cmd(poweron, poweroff, parallel, intelligent, nodename):
         inventory.show()
     else:
         try:
-            discovery.discover_node(nodename, poweron)
+            discovery.discover_node(nodename, poweron, poweroff)
         except discovery.DiscoveryFailedError as e:
+            logger.exception(e)
             click.echo('Discovery failed: ' + str(e))
         inventory.show(nodename)
 
