@@ -51,12 +51,18 @@ def discover_all(parallel=True, poweron=True, poweroff=False):
     for node in nodes:
         if node.has_missing_macs():
             if node.is_off():
+                # Temporarily activating PXE helps in the discovery
+                logger.info('Temporarily activating PXE on node {}'.format(node.name))
+                node.activate_pxe()
                 logger.info('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
                 if poweroff:
                     logger.info('Powering off node {}'.format(node.name))
                     node.power_off()
+                    # Temporarily activating PXE helps in the discovery
+                    logger.info('Temporarily activating PXE on node {}'.format(node.name))
+                    node.activate_pxe()
                     logger.info('Powering on node {}'.format(node.name))
                     node.power_on()
                 else:
@@ -106,6 +112,9 @@ def discover_node(nodename, poweron=True, poweroff=False):
         # Second try: we turn on the node and retry
         if node.has_missing_macs():
             if node.is_off():
+                # Temporarily activating PXE helps in the discovery
+                logger.info('Temporarily activating PXE on node {}'.format(node.name))
+                node.activate_pxe()
                 logger.info('Powering on node {}'.format(node.name))
                 node.power_on()
             else:
@@ -113,6 +122,9 @@ def discover_node(nodename, poweron=True, poweroff=False):
                 if poweroff:
                     logger.info('Powering off node {}'.format(node.name))
                     node.power_off()
+                    # Temporarily activating PXE helps in the discovery
+                    logger.info('Temporarily activating PXE on node {}'.format(node.name))
+                    node.activate_pxe()
                     logger.info('Powering on node {}'.format(node.name))
                     node.power_on()
                 else:
@@ -134,17 +146,16 @@ def discover_node(nodename, poweron=True, poweroff=False):
             inventory.save(node)
             return node
         else:
-            logger.warn('Unable to find all MACs for node {}'.format(node.name))
+            logger.warn(
+                'Unable to find all MACs for node {} after {} retries'
+                .format(node.name, RETRIES))
             logger.info('MACs found: {}'.format(node.switchports))
             inventory.save(node)
-            raise ReachedRetryCount(
-                'Unable to find all MACs for node {}'.format(node.name))
+            return node
     else:
         # If poweron=False just return what we found until now
         inventory.save(node)
-        if node.has_missing_macs():
-            raise DiscoveryFailedError('Unable to discover all MACs of {}'.format(
-                node.name))
+        logger.warn('Unable to discover all MACs of {}'.format(node.name))
         return node
 
 

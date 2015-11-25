@@ -48,6 +48,10 @@ class BMC(object):
                 return True
         return self._run_ipmi_cmd('chassis power off')
 
+    def activate_pxe(self):
+        """Temporarily activate pxe for next boot"""
+        return self._run_ipmi_cmd('chassis bootdev pxe')
+
     def _run_ipmi_cmd(self, cmd):
         """Run a given ipmi command"""
         ipmicmd = 'ipmitool -I lanplus -H {} -U {} -P {} {}'.format(
