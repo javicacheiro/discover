@@ -42,14 +42,14 @@ def learn_cmd(poweron, poweroff, parallel, intelligent, nodename):
                     discovery.discover_all(
                         parallel=False, poweron=poweron, poweroff=poweroff)
                 except discovery.ReachedRetryCount as e:
-                    logger.exception(e)
+                    logger.error(e)
                     click.echo('Unable to discover all nodes using intelligent mode')
         inventory.show()
     else:
         try:
             discovery.discover_node(nodename, poweron, poweroff)
         except discovery.DiscoveryFailedError as e:
-            logger.exception(e)
+            logger.error(e)
             click.echo('Discovery failed: ' + str(e))
         inventory.show(nodename)
 
