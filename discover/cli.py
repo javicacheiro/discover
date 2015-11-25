@@ -41,8 +41,11 @@ def learn_cmd(poweron, poweroff, parallel, intelligent, nodename):
                     click.echo('Unable to discover all nodes using intelligent mode')
         inventory.show()
     else:
-        node = discovery.discover_node(nodename, poweron=poweron)
-        inventory.print_node(node)
+        try:
+            discovery.discover_node(nodename, poweron)
+        except discovery.DiscoveryFailedError as e:
+            click.echo('Discovery failed: ' + str(e))
+        inventory.show(nodename)
 
 
 @cli.command('show')

@@ -47,4 +47,9 @@ After that you can install snimpy:
 
 Usage
 -----
-    discover learn --poweron c14-10
+    discover learn all
+    discover learn c14-10
+    discover learn --poweroff all
+    discover learn --poweroff c14-10
+
+    discover show

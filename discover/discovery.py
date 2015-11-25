@@ -18,12 +18,17 @@ DELAY = 60
 logger = logging.getLogger(__name__)
 
 
-class MultipleMacException(Exception):
+class DiscoveryFailedError(Exception):
+    """Unable to complete discovery"""
+    pass
+
+
+class MultipleMacError(DiscoveryFailedError):
     """More than one MAC found"""
     pass
 
 
-class ReachedRetryCount(Exception):
+class ReachedRetryCount(DiscoveryFailedError):
     """Number of retries reached for node discovery"""
     pass
 
@@ -137,6 +142,9 @@ def discover_node(nodename, poweron=True, poweroff=False):
     else:
         # If poweron=False just return what we found until now
         inventory.save(node)
+        if node.has_missing_macs():
+            raise DiscoveryFailedError('Unable to discover all MACs of {}'.format(
+                node.name))
         return node
 
 
@@ -150,7 +158,7 @@ def _query_switches(node):
             elif len(macs) > 1:
                 logger.error('Found {} MACs for node {} on switch {}'.format(
                     len(macs), node.name, swname))
-                raise MultipleMacException(
+                raise MultipleMacError(
                     'Found more than one MAC in the given port')
             else:
                 logger.debug('MAC not found for node {} on switch {}'.format(

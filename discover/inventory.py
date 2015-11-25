@@ -39,16 +39,22 @@ def load(nodename):
         raise NodeNotFoundError('Node not found in inventory')
 
 
-def show():
+def show(nodename='all'):
     """Show the information about nodes in the inventory"""
     print('#node x1 n1 n2')
-    for filename in glob.glob(os.path.join(DEFAULT_DB_DIR, '*.p')):
+    if nodename.lower() == 'all':
+        for filename in glob.glob(os.path.join(DEFAULT_DB_DIR, '*.p')):
+            with open(filename) as nodefile:
+                node = pickle.load(nodefile)
+                _print_node(node)
+    else:
+        filename = os.path.join(DEFAULT_DB_DIR, nodename + '.p')
         with open(filename) as nodefile:
             node = pickle.load(nodefile)
-            print_node(node)
+            _print_node(node)
 
 
-def print_node(node):
+def _print_node(node):
     """Print the information about a given node"""
     macs = {}
     for sw, opts in node.switchports.items():
