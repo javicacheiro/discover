@@ -11,7 +11,7 @@ from . import config
 from . import inventory
 
 # Number of retries
-RETRIES = 4
+RETRIES = 6
 # Time between retries
 DELAY = 60
 
