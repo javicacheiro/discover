@@ -7,6 +7,7 @@ import os
 import glob
 import logging
 import cPickle as pickle
+from . import cobbler
 
 logger = logging.getLogger(__name__)
 
@@ -64,3 +65,9 @@ def _print_node(node):
             macs[opts['nic']] = 'UNKNOWN'
     #TODO: Make the NIC printing generic: sorted(macs), homogeneous groups of nodes
     print('{} {} {} {}'.format(node.name, macs['x1'], macs['n1'], macs['n2']))
+
+
+def export_to_cobbler(nodename):
+    """Export the inventory to cobbler format"""
+    node = load(nodename)
+    cobbler.add(node)

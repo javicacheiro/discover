@@ -59,6 +59,7 @@ def show_cmd():
     inventory.show()
 
 
-@cli.command('cobbler')
-def cobbler_cmd():
-    click.echo('Output of cobbler command')
+@cli.command('add-to-cobbler')
+@click.argument('nodename')
+def cobbler_cmd(nodename):
+    inventory.export_to_cobbler(nodename)

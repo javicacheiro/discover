@@ -1,0 +1,5 @@
+# Cobbler server
+cobbler: 
+  url: https://192.168.0.114/cobbler_api
+  login: admin
+  password: verysecretpassword

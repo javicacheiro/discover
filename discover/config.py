@@ -15,9 +15,12 @@ DEFAULT_CONF_DIRS = [os.path.expanduser('~/.discover'), '/etc/discover', './conf
 SWFILE = 'switches.yml'
 NODESFILE = 'nodes.yml'
 LOGCONFFILE = 'logging.yml'
+SETTINGSFILE = 'settings.yml'
 
 switches = {}
 nodes = {}
+logconf = {}
+settings = {}
 
 
 class Config():
@@ -49,6 +52,7 @@ class Config():
         self.switches = self._load_file(SWFILE)
         self.nodes = self._load_file(NODESFILE)
         self.logconf = self._load_file(LOGCONFFILE)
+        self.settings = self._load_file(SETTINGSFILE)
 
     def _load_file(self, filename):
         """Return a object representing the contents of a yaml file"""
@@ -76,4 +80,6 @@ for confdir in DEFAULT_CONF_DIRS:
         logging.config.dictConfig(cfg.logconf)
         switches = cfg.switches
         nodes = cfg.nodes
+        logconf = cfg.logconf
+        settings = cfg.settings
         logging.debug('Configuration loaded from {}'.format(confdir))
