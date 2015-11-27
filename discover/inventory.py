@@ -31,6 +31,8 @@ def save(node):
 
 def load(nodename):
     """Load a given node from the inventory"""
+    #FIXME: Detect if there are changes in the node configuration so they
+    #       are applied to the inventory object if needed
     filename = os.path.join(DEFAULT_DB_DIR, nodename + '.p')
     try:
         with open(filename, 'r') as dumpfile:

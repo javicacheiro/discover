@@ -25,10 +25,14 @@ def add(node):
     server.modify_system(system_id, 'hostname', node.name + '.local', token)
     #FIXME: Find a way of assiging the node IP address and selecting the interface
     server.modify_system(system_id, 'modify_interface', {
-        "macaddress-eno1"   : node.switchports['SW14-1']['mac'],
-        "ipaddress-eno1"    : node.bmcaddr.replace('.131.', '.119.'),
-        "netmask-eno1"      : "255.255.0.0",
-        "gateway-eno1"      : "10.119.0.1",
+        #"macaddress-eno1"   : node.switchports['SW14-1']['mac'],
+        #"ipaddress-eno1"    : node.bmcaddr.replace('.131.', '.119.'),
+        #"netmask-eno1"      : "255.255.0.0",
+        #"gateway-eno1"      : "10.119.0.1",
+        "macaddress-ens3f0"   : node.get_mac('x1'),
+        "ipaddress-ens3f0"    : node.bmcaddr.replace('.131.', '.119.'),
+        "netmask-ens3f0"      : "255.255.0.0",
+        "gateway-ens3f0"      : "10.119.0.1",
     }, token)
     server.modify_system(system_id, 'gateway', '10.119.0.1', token)
     server.modify_system(system_id, 'profile', 'CentOS7-x86_64', token)

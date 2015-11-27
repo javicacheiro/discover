@@ -11,6 +11,11 @@ import time
 SHUTDOWN_GRACE_TIME = 5
 
 
+class MacAddressNotFoundError(Exception):
+    """MAC Address not found"""
+    pass
+
+
 class BMC(object):
     """BMC representation"""
     def __init__(self, address, user, password):
@@ -94,3 +99,10 @@ class Node(BMC):
     def has_missing_macs(self):
         """Confirm if there are missing MACs"""
         return not self.has_all_macs()
+
+    def get_mac(self, nic):
+        """Get the MAC address for the given NIC interface"""
+        for sw, swopts in self.switchports.items():
+            if swopts['nic'] == nic:
+                return swopts['mac']
+        raise MacAddressNotFoundError('No MAC address found for NIC {}'.format(nic))
