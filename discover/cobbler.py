@@ -36,6 +36,10 @@ def add(node):
     }, token)
     server.modify_system(system_id, 'gateway', '10.119.0.1', token)
     server.modify_system(system_id, 'profile', 'CentOS7-x86_64', token)
+    server.modify_system(system_id, 'power_type', 'ipmilan', token)
+    server.modify_system(system_id, 'power_address', node.bmcaddr, token)
+    server.modify_system(system_id, 'power_user', 'USERID', token)
+    server.modify_system(system_id, 'power_pass', 'PASSW0RD', token)
     server.modify_system(system_id, 'netboot_enabled', True, token)
 
     server.save_system(system_id, token)
