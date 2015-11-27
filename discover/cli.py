@@ -59,7 +59,11 @@ def show_cmd():
     inventory.show()
 
 
-@cli.command('add-to-cobbler')
+@cli.command('export')
+@click.argument('format')
 @click.argument('nodename')
-def cobbler_cmd(nodename):
-    inventory.export_to_cobbler(nodename)
+def export_cmd(format, nodename):
+    if format == 'cobbler':
+        inventory.export_to_cobbler(nodename)
+    else:
+        click.echo('ERROR: Supported export formats: cobbler')
