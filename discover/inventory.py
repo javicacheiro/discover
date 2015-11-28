@@ -44,20 +44,41 @@ def load(nodename):
 
 def show(nodename='all'):
     """Show the information about nodes in the inventory"""
-    print('#node x1 n1 n2')
     if nodename.lower() == 'all':
-        for filename in glob.glob(os.path.join(DEFAULT_DB_DIR, '*.p')):
-            with open(filename) as nodefile:
-                node = pickle.load(nodefile)
-                _print_node(node)
+        nodes = _load_all_nodes_from_inventory()
+        nics = _nic_names(nodes)
+        print('#node,' + ','.join(nics))
+        for node in nodes:
+            _print_node(node, nics)
     else:
         filename = os.path.join(DEFAULT_DB_DIR, nodename + '.p')
         with open(filename) as nodefile:
             node = pickle.load(nodefile)
-            _print_node(node)
+            nics = set()
+            for sw, opts in node.switchports.items():
+                nics.add(opts['nic'])
+            _print_node(node, nics)
 
 
-def _print_node(node):
+def _load_all_nodes_from_inventory():
+    """Loads all the nodes available in the inventory"""
+    nodes = []
+    for filename in glob.glob(os.path.join(DEFAULT_DB_DIR, '*.p')):
+        with open(filename) as nodefile:
+            nodes.append(pickle.load(nodefile))
+    return nodes
+
+
+def _nic_names(nodes):
+    """Get the names of the NICs of the given nodes"""
+    nics = set()
+    for node in nodes:
+        for sw, opts in node.switchports.items():
+            nics.add(opts['nic'])
+    return nics
+
+
+def _print_node(node, nics):
     """Print the information about a given node"""
     macs = {}
     for sw, opts in node.switchports.items():
@@ -65,8 +86,10 @@ def _print_node(node):
             macs[opts['nic']] = opts['mac']
         else:
             macs[opts['nic']] = 'UNKNOWN'
-    #TODO: Make the NIC printing generic: sorted(macs), homogeneous groups of nodes
-    print('{} {} {} {}'.format(node.name, macs['x1'], macs['n1'], macs['n2']))
+    for nic in nics:
+        if nic not in macs:
+            macs[nic] = 'N/A'
+    print('{},'.format(node.name) + ','.join(macs[nic] for nic in nics))
 
 
 def export_to_cobbler(nodename):
