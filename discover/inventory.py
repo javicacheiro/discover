@@ -5,6 +5,7 @@
 from __future__ import print_function, with_statement
 import os
 import glob
+import re
 import logging
 import cPickle as pickle
 from . import cobbler
@@ -49,6 +50,16 @@ def show(nodename='all'):
         nics = _nic_names(nodes)
         print('{:10}'.format('Nodename') + ''.join('   {:^17}'.format(nic) for nic in nics))
         print('-'*(10 + 20*len(nics)))
+        # Sort the nodes in numerical order: pad the numeric parts for the right output
+        #nodes.sort(key=lambda node: re.sub('(\d+)', lambda m: '{:08d}'.format(int(m.group(0))), node.name))
+        digits = re.compile(r'(\d+)')
+
+        def expanded_nodename(node):
+            def pad_numbers(m):
+                return '{:08d}'.format(int(m.group(0)))
+            return digits.sub(pad_numbers, node.name)
+
+        nodes.sort(key=expanded_nodename)
         for node in nodes:
             _print_node(node, nics)
     else:
