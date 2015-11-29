@@ -47,17 +47,18 @@ def show(nodename='all'):
     if nodename.lower() == 'all':
         nodes = _load_all_nodes_from_inventory()
         nics = _nic_names(nodes)
-        print('#node,' + ','.join(nics))
+        print('{:10}'.format('Nodename') + ''.join('   {:^17}'.format(nic) for nic in nics))
+        print('-'*(10 + 20*len(nics)))
         for node in nodes:
             _print_node(node, nics)
     else:
         filename = os.path.join(DEFAULT_DB_DIR, nodename + '.p')
         with open(filename) as nodefile:
             node = pickle.load(nodefile)
-            nics = set()
-            for sw, opts in node.switchports.items():
-                nics.add(opts['nic'])
-            _print_node(node, nics)
+        nics = set()
+        for sw, opts in node.switchports.items():
+            nics.add(opts['nic'])
+        _print_node(node, nics)
 
 
 def _load_all_nodes_from_inventory():
@@ -89,10 +90,49 @@ def _print_node(node, nics):
     for nic in nics:
         if nic not in macs:
             macs[nic] = 'N/A'
+    print('{:10}'.format(node.name) + ''.join('   {:17}'.format(macs[nic]) for nic in nics))
+
+
+def _export_node_to_csv(node, nics):
+    """Export to csv a given node"""
+    macs = {}
+    for sw, opts in node.switchports.items():
+        if 'mac' in opts:
+            macs[opts['nic']] = opts['mac']
+        else:
+            macs[opts['nic']] = 'UNKNOWN'
+    # Mark non-existent NICs as not available for this node 
+    for nic in nics:
+        if nic not in macs:
+            macs[nic] = 'N/A'
     print('{},'.format(node.name) + ','.join(macs[nic] for nic in nics))
+
+
+def export_to_csv(nodename='all'):
+    """Show the information about nodes in the inventory"""
+    if nodename.lower() == 'all':
+        nodes = _load_all_nodes_from_inventory()
+        nics = _nic_names(nodes)
+        print('#node,' + ','.join(nics))
+        for node in nodes:
+            _export_node_to_csv(node, nics)
+    else:
+        filename = os.path.join(DEFAULT_DB_DIR, nodename + '.p')
+        with open(filename) as nodefile:
+            node = pickle.load(nodefile)
+        nics = set()
+        for sw, opts in node.switchports.items():
+            nics.add(opts['nic'])
+        print('#node,' + ','.join(nics))
+        _export_node_to_csv(node, nics)
 
 
 def export_to_cobbler(nodename):
     """Export the inventory to cobbler format"""
-    node = load(nodename)
-    cobbler.add(node)
+    if nodename.lower() == 'all':
+        nodes = _load_all_nodes_from_inventory()
+        for node in nodes:
+            cobbler.add(node)
+    else:
+        node = load(nodename)
+        cobbler.add(node)

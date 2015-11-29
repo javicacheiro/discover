@@ -63,7 +63,10 @@ def show_cmd():
 @click.argument('format')
 @click.argument('nodename')
 def export_cmd(format, nodename):
+    supported_formats = ('cobbler', 'csv')
     if format == 'cobbler':
         inventory.export_to_cobbler(nodename)
+    elif format == 'csv':
+        inventory.export_to_csv(nodename)
     else:
-        click.echo('ERROR: Supported export formats: cobbler')
+        click.echo('ERROR: Supported export formats: ' + str(supported_formats))
