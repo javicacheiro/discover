@@ -53,3 +53,6 @@ Usage
     discover learn --poweroff c14-10
 
     discover show
+
+    discover export cobbler c14-10
+    discover export csv all
