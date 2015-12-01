@@ -23,7 +23,12 @@ def add(node):
     system_id = server.new_system(token)
     server.modify_system(system_id, 'name', node.name, token)
     server.modify_system(system_id, 'hostname', node.name + '.local', token)
-    #FIXME: Find a way of assiging the node IP address and selecting the interface
+    #FIXME: Find a way of given cobbler specific settings in the nodes.yml
+    #       - node IP address
+    #       - netmask
+    #       - gateway
+    #       - interface name
+    #       - cobbler profile
     server.modify_system(system_id, 'modify_interface', {
         #"macaddress-eno1"   : node.switchports['SW14-1']['mac'],
         #"ipaddress-eno1"    : node.bmcaddr.replace('.131.', '.119.'),
@@ -37,9 +42,9 @@ def add(node):
     server.modify_system(system_id, 'gateway', '10.119.0.1', token)
     server.modify_system(system_id, 'profile', 'CentOS7-x86_64', token)
     server.modify_system(system_id, 'power_type', 'imm', token)
-    server.modify_system(system_id, 'power_address', node.bmcaddr, token)
-    server.modify_system(system_id, 'power_user', 'USERID', token)
-    server.modify_system(system_id, 'power_pass', 'PASSW0RD', token)
+    server.modify_system(system_id, 'power_address', node.bmcaddress, token)
+    server.modify_system(system_id, 'power_user', node.bmcuser, token)
+    server.modify_system(system_id, 'power_pass', node.bmcpasswd, token)
     server.modify_system(system_id, 'netboot_enabled', True, token)
 
     server.save_system(system_id, token)
