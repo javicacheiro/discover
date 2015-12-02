@@ -5,15 +5,18 @@ node-{{ rack }}-{{ node }}:
     address: 10.131.{{ rack }}.{{ node }}
     user: USERID
     password: PASSW0RD
-  switchports: 
-    SW{{ rack }}-1: 
+  nics:
+    nic1:
+      switch: SW{{ rack }}-1
       port: {{ node }}
       vlan: 119
-      nic: n1
-    SW{{ rack }}-2:
+      # MAC will be auto-discovered but you can specify it to avoid discovery in this NIC
+      mac: ''
+    nic2:
+      switch: SW{{ rack }}-2
       port: {{ node }}
       vlan: 119
-      nic: n2
+      mac: ''
   cobbler:
     nic: x1
     device: ens3f0
