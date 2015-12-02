@@ -6,6 +6,7 @@ from __future__ import print_function, with_statement
 import subprocess
 import re
 import time
+from .helpers import ToDictMixin
 
 # Seconds to wait for the OS to shutdown gracefully
 SHUTDOWN_GRACE_TIME = 5
@@ -19,9 +20,9 @@ class MacAddressNotFoundError(Exception):
 class BMC(object):
     """BMC representation"""
     def __init__(self, address, user, password):
-        self.bmcaddress = address
-        self.bmcuser = user
-        self.bmcpasswd = password
+        self.address = address
+        self.user = user
+        self.password = password
 
     def is_on(self):
         """Check the node power status is on"""
@@ -60,7 +61,7 @@ class BMC(object):
     def _run_ipmi_cmd(self, cmd):
         """Run a given ipmi command"""
         ipmicmd = 'ipmitool -I lanplus -H {} -U {} -P {} {}'.format(
-            self.bmcaddress, self.bmcuser, self.bmcpasswd, cmd)
+            self.address, self.user, self.password, cmd)
         try:
             output = subprocess.check_output(ipmicmd, shell=True)
         except subprocess.CalledProcessError as error:
@@ -71,19 +72,19 @@ class BMC(object):
         return output
 
 
-class Node(BMC):
+class Node(ToDictMixin):
     """Representation of a given node"""
-    def __init__(self, name, switchports, bmcaddr, bmcuser, bmcpasswd):
-        super(Node, self).__init__(bmcaddr, bmcuser, bmcpasswd)
+    def __init__(self, name, switchports={}, bmcaddr='', bmcuser='', bmcpasswd=''):
+        self.bmc = BMC(bmcaddr, bmcuser, bmcpasswd)
         self.name = name
         self.switchports = switchports
-        self.bmcaddr = bmcaddr
-        self.bmcuser = bmcuser
-        self.bmcpasswd = bmcpasswd
 
     def __repr__(self):
-        return '<{}({})>'.format(self.__class__, self.name, self.switchports,
-                               self.bmcaddr, self.bmcuser, self.bmcpasswd)
+        return ('<{}({}, switchports={}, bmcaddr={}, bmcuser={}, bmcpasswd={})>'
+                .format(
+                    self.__class__, self.name, self.switchports,
+                    self.bmcaddr, self.bmcuser, self.bmcpasswd
+                ))
 
     def add_mac(self, switch, mac):
         """Associate the given mac to the switchport"""

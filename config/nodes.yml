@@ -14,5 +14,13 @@ node-{{ rack }}-{{ node }}:
       port: {{ node }}
       vlan: 119
       nic: n2
+  cobbler:
+    nic: x1
+    device: ens3f0
+    address: 10.119.{{ rack }}.{{ node }}
+    netmask: 255.255.0.0
+    gateway: 10.119.0.1
+    profile: CentOS7-x86_64
+    powertype: imm
 {% endfor %}
 {% endfor %}
